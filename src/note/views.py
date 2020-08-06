@@ -18,6 +18,7 @@ def sticky_note_detail_page(request, note_id):
         context = {"object" : obj}
         return render(request, template_name, context)
 
+@login_required
 def sticky_note_overview_page(request):
     objs = StickyNote.objects.filter(user = request.user)
     print(request.user)
@@ -80,4 +81,18 @@ def ajax_note_update_page(request):
             note.x = int(int(float(X.replace("px", "")))*100/xScreen)
             note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
             note.save()
+    return HttpResponse('Hue')
+
+@csrf_exempt
+def ajax_note_update_content_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        note = StickyNote.objects.get(id=int(contentdict["id"][0]));
+        header = contentdict["header"][0]
+        content = contentdict["content"][0]
+        
+        #note = list(objs[0])
+        note.title = header
+        note.content = content
+        note.save()
     return HttpResponse('Hue')
