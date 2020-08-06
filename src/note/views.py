@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from .models import StickyNote
 def sticky_note_detail_page(request, note_id):
     obj = StickyNote.objects.get(id = note_id)
-    if obj.user != request.user:
+    if obj.user == request.user:
         #raise ValidationError("You are not the author of this note")
         return redirect("../")
     else:
@@ -21,7 +21,6 @@ def sticky_note_detail_page(request, note_id):
 @login_required
 def sticky_note_overview_page(request):
     objs = StickyNote.objects.filter(user = request.user)
-    print(request.user)
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
     return render(request, template_name, context)
@@ -79,3 +78,16 @@ def ajax_note_update_page(request):
         obj.save()
     return HttpResponse('Perfect!')
 
+@csrf_exempt
+def ajax_note_update_content_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        note = StickyNote.objects.get(id=int(contentdict["id"][0]));
+        header = contentdict["header"][0]
+        content = contentdict["content"][0]
+
+        #note = list(objs[0])
+        note.title = header
+        note.content = content
+        note.save()
+    return HttpResponse('Hue')

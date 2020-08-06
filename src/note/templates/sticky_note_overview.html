@@ -91,17 +91,9 @@ for (var i = 0; i < mydivs.length; i++){
   calibrateNotePosition()
 }
 function getNoteObj(e) {
-	if (e.originalTarget != undefined) {
-		e = e.originalTarget 
-	}
-
-	switch (e.getAttribute("class")) {
-	case "mydiv":
-			break
-	default:
-		e = e.offsetParent
-		// console.log("ASSUMING FINE: going to", e)
-	}
+	e = e.target
+	note_id = e.getAttribute("note_id")
+	e = document.getElementById(note_id)
 	return e
 }
 var isFocused = false;
@@ -196,7 +188,6 @@ function dragElement(elmnt) {
     e = getNoteObj(e)
     e.setAttribute("x", e.offsetLeft*100/w)
     e.setAttribute("y", e.offsetTop *100/h)
-    mydivs[i].setAttribute("Y", mydivs[i].offsetTop*100/h)
     $.ajax({
       url: '/note/ajax/update/',
       data: {"x":e.getAttribute("x"), 
