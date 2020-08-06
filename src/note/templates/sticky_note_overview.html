@@ -53,12 +53,19 @@
 
 <script>
 //Make the DIV element draggagle:
+window.addEventListener("resize", calibrateNotePosition);
 
+function calibrateNotePosition(){
+for (var i = 0; i < mydivs.length; i++){
+  mydivs[i].style.left = mydivs[i].getAttribute("--X")*window.innerWidth/100 + "px"
+  mydivs[i].style.top  = mydivs[i].getAttribute("--Y")*window.innerHeight/100 + "px"
+}
+
+}
 var mydivs = document.getElementsByClassName("mydiv")
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
-  mydivs[i].style.left = mydivs[i].getAttribute("--Y") + "%"
-  mydivs[i].style.top = mydivs[i].getAttribute("--X") + "%"
+  calibrateNotePosition()
 }
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -98,15 +105,17 @@ function dragElement(elmnt) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
-    var posdict = {}
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var posdict = {"xScreen":w, "yScreen":h}
     for (var i = 0; i < mydivs.length; i++){
       var mydivStyle = mydivs[i].style
       var note_id = mydivs[i].getAttribute('--note-id')
-      posdict[note_id] = [mydivStyle.top, mydivStyle.left]
-      console.log("CORDS:", [mydivStyle.top, mydivStyle.left])
+      posdict[note_id] = [mydivStyle.left, mydivStyle.top]
+      console.log("CORDS:", [mydivStyle.left, mydivStyle.top])
 
     }
-    console.log('Logging:', posdict)
+    console.log("Width and Height:", w, h)
     $.ajax({
       url: '/note/ajax/update/',
       data: posdict,
