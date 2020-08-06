@@ -75,3 +75,17 @@ def ajax_note_update_page(request):
             note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
             note.save()
     return HttpResponse('Hue')
+
+@csrf_exempt
+def ajax_note_update_content_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        note = StickyNote.objects.get(id=int(contentdict["id"][0]));
+        header = contentdict["header"][0]
+        content = contentdict["content"][0]
+        
+        #note = list(objs[0])
+        note.title = header
+        note.content = content
+        note.save()
+    return HttpResponse('Hue')
