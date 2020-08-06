@@ -15,3 +15,4 @@ class StickyNote(models.Model):
         self.x = X
         self.y = Y
         return
+

@@ -3,18 +3,25 @@ from .forms import StickyNoteForm, StickyNoteModelForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+from django.core.exceptions import ValidationError
 #from .serializers import UserSerializers, GroupSerializers
 # Create your views here.
 
 from .models import StickyNote
 def sticky_note_detail_page(request, note_id):
     obj = StickyNote.objects.get(id = note_id)
-    template_name = "sticky_note_detail.html"
-    context = {"object" : obj}
-    return render(request, template_name, context)
+    if obj.user != request.user:
+        #raise ValidationError("You are not the author of this note")
+        return redirect("../")
+    else:
+        template_name = "sticky_note_detail.html"
+        context = {"object" : obj}
+        return render(request, template_name, context)
 
+@login_required
 def sticky_note_overview_page(request):
-    objs = StickyNote.objects.all()
+    objs = StickyNote.objects.filter(user = request.user)
+    print(request.user)
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
     return render(request, template_name, context)
@@ -71,3 +78,4 @@ def ajax_note_update_page(request):
         obj.y = int(float(y))
         obj.save()
     return HttpResponse('Perfect!')
+
