@@ -1,35 +1,55 @@
 <!DOCTYPE html>
-<html>
+
+{% extends "base.html" %}
+{% block note_content %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
 <style>
 .mydiv {
-  position: absolute;
+  position: fixed;
   z-index: 9;
   background-color: #fcfc00;
   text-align: center;
   border: 1px solid #aaaa00;
-  height: 166px;
-  width: 166px;
+  height: min(15vw, 15vh);
+  width: min(15vw, 15vh);
 }
 
 .mydivheader {
-  padding: 10px;
   cursor: move;
   z-index: 10;
   background-color: #f0f000;
 }
-</style>
-<body>
 
-{% block note_content %}
+.column {
+  float: left;
+  width: 33.333333333%;
+  text-align: center;
+  height: 100vh;
+}
+</style>
+<body id = "frame">
+
+  <div class="column" style="background-color:#ccc;">
+    <h1> To-Do </h1>
+  </div>
+  <div class="column" style="background-color:#aaa;">
+    <h1> In Progress </h1>
+  </div>
+  <div class="column" style="background-color:#bbb;">
+    <h1> Done </h1>
+  </div>
+
 {% for object in objects %}
 
-<div class="mydiv">
+<div class="mydiv" --X = {{object.x}} --Y = {{object.y}} --note-id = {{object.id}}>
   <div class="mydivheader"> {{object.title}} </div>
   <p>{{object.content}}</p>
 </div>
 
 {% endfor %}
-{% endblock %}
+
 
 <script>
 //Make the DIV element draggagle:
@@ -37,6 +57,8 @@
 var mydivs = document.getElementsByClassName("mydiv")
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
+  mydivs[i].style.left = mydivs[i].getAttribute("--Y") + "%"
+  mydivs[i].style.top = mydivs[i].getAttribute("--X") + "%"
 }
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -52,8 +74,8 @@ function dragElement(elmnt) {
     e = e || window.event;
     e.preventDefault();
     // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
+    pos3 = e.clientX ;
+    pos4 = e.clientY ;
     document.onmouseup = closeDragElement;
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
@@ -76,9 +98,31 @@ function dragElement(elmnt) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
+    var posdict = {}
+    for (var i = 0; i < mydivs.length; i++){
+      var mydivStyle = mydivs[i].style
+      var note_id = mydivs[i].getAttribute('--note-id')
+      posdict[note_id] = [mydivStyle.top, mydivStyle.left]
+      console.log("CORDS:", [mydivStyle.top, mydivStyle.left])
+
+    }
+    console.log('Logging:', posdict)
+    $.ajax({
+      url: '/note/ajax/update/',
+      data: posdict,
+      type: 'POST'
+    })
+    console.log('Logging complete!')
+    //   dict[mydivStyle.getPropertyValue("--note-id")] = (mydivStyle.top, mydivStyle.left);
+    // }
+    // console.log("made it boi");
+    // var dictString = JSON.stringify(dict);
+    // var fs = require('fs');
+    // fs.writeFile("mydivs.json", dictstring);
   }
+
 }
 </script>
 
 </body>
-</html>
+{% endblock %}
