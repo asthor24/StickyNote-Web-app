@@ -14,16 +14,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from .views import home_page,about_page
-from note.views import sticky_note_detail_page, sticky_note_overview_page, sticky_test
+from django.urls import path, include
+from .views import home_page,about_page, form_page
+from note.views import sticky_note_detail_page, sticky_note_overview_page, sticky_note_test_page
 
 
 urlpatterns = [
     path("", home_page),
     path('admin/', admin.site.urls),
     path('about/', about_page),
-    path('note/<int:note_id>/', sticky_note_detail_page),
-    path('note/', sticky_note_overview_page),
-    path('test/', sticky_test)
+    path('note/', include('note.urls')),
+    path('form/',form_page)
+
 ]
