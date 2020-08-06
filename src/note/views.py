@@ -60,18 +60,14 @@ def sticky_note_delete_page(request,note_id):
 @csrf_exempt
 def ajax_note_update_page(request):
     if request.method == "POST" and request.is_ajax():
-        objs = StickyNote.objects.all()
-        posdict = dict(request.POST)
-        print(type(posdict), posdict)
-        for note in objs:
-            if len(posdict[str(note.id) + '[]']) == 0:
-                continue
-            print(posdict[str(note.id) + '[]'])
-            X, Y = posdict[str(note.id) + '[]'] if posdict[str(note.id) + '[]'] else (None, None)
-            if (not X) or (not Y):
-                continue
-            xScreen, yScreen = map(int, (posdict["xScreen"][0], posdict["yScreen"][0]))
-            note.x = int(int(float(X.replace("px", "")))*100/xScreen)
-            note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
-            note.save()
-    return HttpResponse('Hue')
+        reqDict = dict(request.POST)
+        # Remove list from values
+        reqDict = {key : val[0] for (key,val) in reqDict.items()}
+        obj = StickyNote.objects.get(id=reqDict["note_id"])
+        x, y = reqDict["x"], reqDict["y"]
+        if not x or not y:
+                raise ValueError("The post position was not found!")
+        obj.x = int(float(x))
+        obj.y = int(float(y))
+        obj.save()
+    return HttpResponse('Perfect!')

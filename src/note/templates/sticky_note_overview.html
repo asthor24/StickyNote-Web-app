@@ -43,7 +43,7 @@
 
 {% for object in objects %}
 
-<div class="mydiv" --X = {{object.x}} --Y = {{object.y}} --note-id = {{object.id}}>
+<div class="mydiv" x = {{object.x}} y = {{object.y}} note_id = {{object.id}}>
   <div class="mydivheader"> {{object.title}} </div>
   <p>{{object.content}}</p>
 </div>
@@ -57,8 +57,9 @@ window.addEventListener("resize", calibrateNotePosition);
 
 function calibrateNotePosition(){
 for (var i = 0; i < mydivs.length; i++){
-  mydivs[i].style.left = mydivs[i].getAttribute("--X")*window.innerWidth/100 + "px"
-  mydivs[i].style.top  = mydivs[i].getAttribute("--Y")*window.innerHeight/100 + "px"
+  mydivs[i].style.left = mydivs[i].getAttribute("x")*window.innerWidth/100 + "px"
+  mydivs[i].style.top  = mydivs[i].getAttribute("y")*window.innerHeight/100 + "px"
+  //console.log("{% for object in objects %} {{object.x}} {% endfor %}")
 }
 
 }
@@ -66,6 +67,20 @@ var mydivs = document.getElementsByClassName("mydiv")
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
   calibrateNotePosition()
+}
+function getNoteObj(e) {
+	if (e.originalTarget != undefined) {
+		e = e.originalTarget 
+	}
+
+	switch (e.getAttribute("class")) {
+	case "mydiv":
+			break
+	default:
+		e = e.offsetParent
+		// console.log("ASSUMING FINE: going to", e)
+	}
+	return e
 }
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -101,33 +116,24 @@ function dragElement(elmnt) {
     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
 
-  function closeDragElement() {
+  function closeDragElement(e) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var posdict = {"xScreen":w, "yScreen":h}
-    for (var i = 0; i < mydivs.length; i++){
-      var mydivStyle = mydivs[i].style
-      var note_id = mydivs[i].getAttribute('--note-id')
-      posdict[note_id] = [mydivStyle.left, mydivStyle.top]
-      console.log("CORDS:", [mydivStyle.left, mydivStyle.top])
-
-    }
-    console.log("Width and Height:", w, h)
+    e = getNoteObj(e)
+	  console.log(e.getAttribute("x"))
+    e.setAttribute("x", e.offsetLeft*100/w)
+    e.setAttribute("y", e.offsetTop *100/h)
     $.ajax({
       url: '/note/ajax/update/',
-      data: posdict,
+      data: {"x":e.getAttribute("x"), 
+	     "y":e.getAttribute("y"),
+	     "note_id":e.getAttribute("note_id")
+      },
       type: 'POST'
     })
-    console.log('Logging complete!')
-    //   dict[mydivStyle.getPropertyValue("--note-id")] = (mydivStyle.top, mydivStyle.left);
-    // }
-    // console.log("made it boi");
-    // var dictString = JSON.stringify(dict);
-    // var fs = require('fs');
-    // fs.writeFile("mydivs.json", dictstring);
   }
 
 }
