@@ -91,3 +91,13 @@ def ajax_note_update_content_page(request):
         note.content = content
         note.save()
     return HttpResponse('Hue')
+
+@csrf_exempt
+def ajax_note_delete_page(request):
+    if request.method == "POST" and request.is_ajax():
+        reqDict = dict(request.POST)
+        # Remove list from values
+        reqDict = {key : val[0] for (key,val) in reqDict.items()}
+        obj = StickyNote.objects.get(id=reqDict["note_id"])
+        obj.delete()
+    return HttpResponse('Perfect!')

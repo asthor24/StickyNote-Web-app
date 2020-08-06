@@ -12,8 +12,8 @@
   background-color: #fcfc00;
   text-align: center;
   border: 1px solid #aaaa00;
-  height: min(30vw, 30vh);
-  width: min(30vw, 30vh);
+  height: min(20vw, 20vh);
+  width: min(20vw, 20vh);
 }
 
 .mydivheader {
@@ -45,8 +45,26 @@
   text-align: center;
   height: 100vh;
 }
+
+.bottomright {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+img { 
+  height: min(10vw, 10vh);
+  width: min(10vw, 10vh);
+}
+
+
 </style>
 <body id = "frame">
+
+{% load static %}
+<img src="{% static "note/trash.png" %}" alt="My image" class="bottomright">
+
 
   <div class="column" style="background-color:#ccc;">
     <h1> To-Do </h1>
@@ -186,16 +204,28 @@ function dragElement(elmnt) {
     var w = window.innerWidth;
     var h = window.innerHeight;
     e = getNoteObj(e)
-    e.setAttribute("x", e.offsetLeft*100/w)
-    e.setAttribute("y", e.offsetTop *100/h)
-    $.ajax({
-      url: '/note/ajax/update/',
-      data: {"x":e.getAttribute("x"), 
-	     "y":e.getAttribute("y"),
-	     "note_id":e.getAttribute("note_id")
-      },
+    x = e.offsetLeft*100/w
+    y = e.offsetTop *100/h
+    e.setAttribute("x", x)
+    e.setAttribute("y", y)
+	  if ((x > 75 && y > 75) && confirm("Delete note?")){
+	  $.ajax({
+      url: '/note/ajax/delete/',
+      data: {"note_id":e.getAttribute("note_id")},
       type: 'POST'
     })
+	    e.remove()
+	  }
+	  else {
+		  $.ajax({
+	    	  url: '/note/ajax/update/',
+     		 data: {"x":x, 
+	    		"y":y,
+			"note_id":e.getAttribute("note_id")
+      	},
+    	  type: 'POST'
+    	})
+	  }
   }
 
 }
