@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import home_page,about_page, form_page, groups_page
+from .views import home_page,about_page, form_page
 from note.views import sticky_note_detail_page, sticky_note_overview_page, sticky_note_test_page
 
 
@@ -25,6 +25,6 @@ urlpatterns = [
     path('about/', about_page),
     path('note/', include('note.urls')),
     path('form/',form_page),
-    path('groups/',groups_page)
+    path('groups/', include('group.urls'))
 
 ]
