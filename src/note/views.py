@@ -18,6 +18,7 @@ def sticky_note_detail_page(request, note_id):
         context = {"object" : obj}
         return render(request, template_name, context)
 
+@login_required
 def sticky_note_overview_page(request):
     objs = StickyNote.objects.filter(user = request.user)
     print(request.user)
