@@ -1,6 +1,5 @@
 from django.db import models
-from note.models import StickyNote
+from django.contrib.auth.models import User
 # Create your models here.
 class Group(models.Model):
-    note_ids = models.ManyToManyField(StickyNote)
-    
+    note_ids = models.ManyToManyField(User)
