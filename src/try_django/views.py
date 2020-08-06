@@ -18,3 +18,6 @@ def form_page(request):
                 "form" : form
     }
     return render(request, "form.html",context)
+
+def groups_page(request):
+    return render(request, "groups.html", {})

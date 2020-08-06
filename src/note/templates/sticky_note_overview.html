@@ -12,14 +12,31 @@
   background-color: #fcfc00;
   text-align: center;
   border: 1px solid #aaaa00;
-  height: min(15vw, 15vh);
-  width: min(15vw, 15vh);
+  height: min(30vw, 30vh);
+  width: min(30vw, 30vh);
 }
 
 .mydivheader {
   cursor: move;
-  z-index: 10;
+  height : 25px;
   background-color: #f0f000;
+}
+
+.headertextbox {
+  background-color: transparent;
+  z-index: 8;
+  width: 100%;
+  text-align: center;
+  border-width: 0px;
+}
+
+.content {
+  background-color: transparent;
+  z-index: 7;
+  width: 100%;
+  text-align: center;
+  border-width: 0px;
+  resize: none
 }
 
 .column {
@@ -43,23 +60,86 @@
 
 {% for object in objects %}
 
-<div class="mydiv" --X = {{object.x}} --Y = {{object.y}} --note-id = {{object.id}}>
-  <div class="mydivheader"> {{object.title}} </div>
-  <p>{{object.content}}</p>
+<div id="{{object.id}}" class="mydiv" X = {{object.x}} Y = {{object.y}} --note-id = {{object.id}} onclick="onClick(id)" >
+  <div class="mydivheader">
+    <input id="{{object.id}} header" value="{{object.title}}" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="headertextbox" --note-id = "{{object.id}}" /> 
+  </div>
+  <textarea id="{{object.id}} content" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="content" --note-id = {{object.id}}>
+    {{object.content}}
+  </textarea>  
 </div>
 
 {% endfor %}
 
 
 <script>
+  var cnt = 40;
 //Make the DIV element draggagle:
+window.addEventListener("resize", calibrateNotePosition);
 
 var mydivs = document.getElementsByClassName("mydiv")
+function calibrateNotePosition(){
+  for (var i = 0; i < mydivs.length; i++){
+    mydivs[i].style.left = mydivs[i].getAttribute("X")*window.innerWidth/100 + "px"
+    mydivs[i].style.top  = mydivs[i].getAttribute("Y")*window.innerHeight/100 + "px"
+    var note_id = mydivs[i].getAttribute("--note-id")
+    console.log(mydivs[i].style.height)
+    document.getElementById(note_id + " content").style.height = parseInt(mydivs[i].clientHeight)-24 + "px";
+  }
+}
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
-  mydivs[i].style.left = mydivs[i].getAttribute("--Y") + "%"
-  mydivs[i].style.top = mydivs[i].getAttribute("--X") + "%"
+  calibrateNotePosition()
 }
+var isFocused = false;
+function setFocus(e)
+{
+  console.log("got focus")
+  for(var i = 0; i < mydivs.length; i++)
+  {
+    mydivs[i].onmousedown = null;
+  }
+  //elmnt.onmousedown = null;
+  isFocused = true;
+  var element = document.getElementById(e)
+  element.focus()
+  element.selectionStart = element.selectionEnd = element.value.length;
+}
+
+function onClick(e)
+{
+  console.log("click")
+  var element = document.getElementById(e)
+  element.style.zIndex = cnt++;
+}
+
+function lostFocus(e)
+{
+  //console.log("lost focus")
+  for(var i = 0; i < mydivs.length; i++)
+  {
+    dragElement(mydivs[i]);
+  }
+  var element = document.getElementById(e);
+  console.log(element)
+  var mydiv = document.getElementById(element.getAttribute("--note-id"))
+  console.log(mydiv);
+  var myheader = document.getElementById(mydiv.id + " header");
+  var mycontent = document.getElementById(mydiv.id + " content");
+
+  var dict = {
+    "id" : mydiv.id,
+    "header" : myheader.value,
+    "content" : mycontent.value
+  }
+  $.ajax({
+      url: '/note/ajax/update/content',
+      data: dict,
+      type: 'POST'
+    })
+
+}
+
 function dragElement(elmnt) {
   var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
   if (document.getElementsByClassName("header")[0]) {
@@ -98,21 +178,26 @@ function dragElement(elmnt) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
-    var posdict = {}
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    var posdict = {"xScreen":w, "yScreen":h}
     for (var i = 0; i < mydivs.length; i++){
       var mydivStyle = mydivs[i].style
       var note_id = mydivs[i].getAttribute('--note-id')
-      posdict[note_id] = [mydivStyle.top, mydivStyle.left]
-      console.log("CORDS:", [mydivStyle.top, mydivStyle.left])
+      posdict[note_id] = [mydivStyle.left, mydivStyle.top]
+      //console.log("CORDS:", [mydivStyle.left, mydivStyle.top])
+
+      mydivs[i].setAttribute("X", mydivs[i].offsetLeft*100/w)
+      mydivs[i].setAttribute("Y", mydivs[i].offsetTop*100/h)
 
     }
-    console.log('Logging:', posdict)
+    //console.log("Width and Height:", w, h)
     $.ajax({
       url: '/note/ajax/update/',
       data: posdict,
       type: 'POST'
     })
-    console.log('Logging complete!')
+    //console.log('Logging complete!')
     //   dict[mydivStyle.getPropertyValue("--note-id")] = (mydivStyle.top, mydivStyle.left);
     // }
     // console.log("made it boi");

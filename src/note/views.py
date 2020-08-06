@@ -70,6 +70,22 @@ def ajax_note_update_page(request):
             X, Y = posdict[str(note.id) + '[]'] if posdict[str(note.id) + '[]'] else (None, None)
             if (not X) or (not Y):
                 continue
-            note.x, note.y = int(X.replace("%", "")), int(Y.replace("%", ""))
+            xScreen, yScreen = map(int, (posdict["xScreen"][0], posdict["yScreen"][0]))
+            note.x = int(int(float(X.replace("px", "")))*100/xScreen)
+            note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
             note.save()
+    return HttpResponse('Hue')
+
+@csrf_exempt
+def ajax_note_update_content_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        note = StickyNote.objects.get(id=int(contentdict["id"][0]));
+        header = contentdict["header"][0]
+        content = contentdict["content"][0]
+        
+        #note = list(objs[0])
+        note.title = header
+        note.content = content
+        note.save()
     return HttpResponse('Hue')
