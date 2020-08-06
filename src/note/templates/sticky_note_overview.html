@@ -31,6 +31,7 @@
 {% endfor %}
 {% endblock %}
 
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script>
 //Make the DIV element draggagle:
 
@@ -71,11 +72,23 @@ function dragElement(elmnt) {
     elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
-
+  var count = 0;
   function closeDragElement() {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
+    console.log(count);
+    
+    $.ajax({
+      url: 'update_count/',
+      data: {'count': count},
+      type: 'POST'
+    }).done(function(response){
+      console.log(response);
+    })
+
+    count += 1;
+
   }
 }
 </script>

@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from .forms import StickyNoteForm, StickyNoteModelForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
 # Create your views here.
 
 from .models import StickyNote
@@ -32,3 +34,10 @@ def sticky_note_create_page(request):
     template_name = "sticky_note_create.html"
     context = {"form":  form}
     return render(request, template_name, context)
+
+@csrf_exempt
+def update_count(request):
+    if request.method == 'POST':
+        print(request.POST.keys())
+        print(request.POST["count"])
+    return HttpResponse('bongo')
