@@ -14,3 +14,7 @@ def sticky_note_overview_page(request):
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
     return render(request, template_name, context)
+
+def sticky_test(request):
+    template_name = "sticky_test.html"
+    return render(request, template_name)

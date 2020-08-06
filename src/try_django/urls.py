@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import home_page,about_page
-from note.views import sticky_note_detail_page, sticky_note_overview_page, sticky_note_test_page
+from note.views import sticky_note_detail_page, sticky_note_overview_page, sticky_test
 
 
 urlpatterns = [
@@ -25,5 +25,5 @@ urlpatterns = [
     path('about/', about_page),
     path('note/<int:note_id>/', sticky_note_detail_page),
     path('note/', sticky_note_overview_page),
-    path('test/', sticky_note_test_page)
+    path('test/', sticky_test)
 ]
