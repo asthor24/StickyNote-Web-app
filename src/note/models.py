@@ -10,3 +10,8 @@ class StickyNote(models.Model):
     y = models.IntegerField(blank = True, null = True)
     slug = models.SlugField(blank = True, null = True)
     content = models.TextField(null= True, blank = True)
+
+    def update_position(self, X,Y):
+        self.x = X
+        self.y = Y
+        return

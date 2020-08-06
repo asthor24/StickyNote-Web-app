@@ -13,6 +13,11 @@ class StickyNoteModelForm(forms.ModelForm):
         fields = ['title', 'content']
 
     def clean_content(self, *args, **kwargs):
+        instance = self.instance
+        title = self.cleaned_data.get("title")
+        qs = StickyNote.objects.filter(title__iexact = title )
+        if instance is not None:
+            qs = qs.exclude(pk = instance.pk)
         content = self.cleaned_data.get('content')
         if len(content) > 200:
             raise forms.ValidationError("Ma dude be more concise")
