@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from .models import StickyNote
 def sticky_note_detail_page(request, note_id):
     obj = StickyNote.objects.get(id = note_id)
-    if obj.user != request.user:
+    if obj.user == request.user:
         #raise ValidationError("You are not the author of this note")
         return redirect("../")
     else:
@@ -18,9 +18,9 @@ def sticky_note_detail_page(request, note_id):
         context = {"object" : obj}
         return render(request, template_name, context)
 
+@login_required
 def sticky_note_overview_page(request):
     objs = StickyNote.objects.filter(user = request.user)
-    print(request.user)
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
     return render(request, template_name, context)
@@ -66,18 +66,28 @@ def sticky_note_delete_page(request,note_id):
 @csrf_exempt
 def ajax_note_update_page(request):
     if request.method == "POST" and request.is_ajax():
-        objs = StickyNote.objects.all()
-        posdict = dict(request.POST)
-        #print(type(posdict), posdict)
-        for note in objs:
-            if len(posdict[str(note.id) + '[]']) == 0:
-                continue
-            #print(posdict[str(note.id) + '[]'])
-            X, Y = posdict[str(note.id) + '[]'] if posdict[str(note.id) + '[]'] else (None, None)
-            if (not X) or (not Y):
-                continue
-            xScreen, yScreen = map(int, (posdict["xScreen"][0], posdict["yScreen"][0]))
-            note.x = int(int(float(X.replace("px", "")))*100/xScreen)
-            note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
-            note.save()
+        reqDict = dict(request.POST)
+        # Remove list from values
+        reqDict = {key : val[0] for (key,val) in reqDict.items()}
+        obj = StickyNote.objects.get(id=reqDict["note_id"])
+        x, y = reqDict["x"], reqDict["y"]
+        if not x or not y:
+                raise ValueError("The post position was not found!")
+        obj.x = int(float(x))
+        obj.y = int(float(y))
+        obj.save()
+    return HttpResponse('Perfect!')
+
+@csrf_exempt
+def ajax_note_update_content_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        note = StickyNote.objects.get(id=int(contentdict["id"][0]));
+        header = contentdict["header"][0]
+        content = contentdict["content"][0]
+
+        #note = list(objs[0])
+        note.title = header
+        note.content = content
+        note.save()
     return HttpResponse('Hue')
