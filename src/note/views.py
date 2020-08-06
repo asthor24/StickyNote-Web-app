@@ -70,6 +70,8 @@ def ajax_note_update_page(request):
             X, Y = posdict[str(note.id) + '[]'] if posdict[str(note.id) + '[]'] else (None, None)
             if (not X) or (not Y):
                 continue
-            note.x, note.y = int(X.replace("%", "")), int(Y.replace("%", ""))
+            xScreen, yScreen = map(int, (posdict["xScreen"][0], posdict["yScreen"][0]))
+            note.x = int(int(float(X.replace("px", "")))*100/xScreen)
+            note.y = int(int(float(Y.replace("px", "")))*100/yScreen)
             note.save()
     return HttpResponse('Hue')
