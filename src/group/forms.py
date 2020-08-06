@@ -4,5 +4,4 @@ from .models import Group
 class GroupModelForm(forms.ModelForm):
     class Meta:
         model = Group
-        fields = ['note_ids']
-
+        fields = ['name']

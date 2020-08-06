@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
 {% block note_content %}
-<h1>You is on the groups page yes</h1>
+{% for group in groups %}
+
+{% if user in group.members.all %}
+  <h1> {{group.name}} </h1>
+{% endif %}
+{% endfor %}
 {% endblock %}
