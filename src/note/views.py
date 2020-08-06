@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from .models import StickyNote
 def sticky_note_detail_page(request, note_id):
     obj = StickyNote.objects.get(id = note_id)
-    if obj.user == request.user:
+    if obj.user != request.user:
         #raise ValidationError("You are not the author of this note")
         return redirect("../")
     else:
