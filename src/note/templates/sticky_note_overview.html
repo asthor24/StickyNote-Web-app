@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<style>
+.mydiv {
+  position: absolute;
+  z-index: 9;
+  background-color: #fcfc00;
+  text-align: center;
+  border: 1px solid #aaaa00;
+  height: 166px;
+  width: 166px;
+}
+
+.mydivheader {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #f0f000;
+}
+</style>
+<body>
+
+{% block note_content %}
+{% for object in objects %}
+
+<div class="mydiv">
+  <div class="mydivheader"> {{object.title}} </div>
+  <p>{{object.content}}</p>
+</div>
+
+{% endfor %}
+{% endblock %}
+
+<script>
+//Make the DIV element draggagle:
+
+var mydivs = document.getElementsByClassName("mydiv")
+for (var i = 0; i < mydivs.length; i++){
+  dragElement(mydivs[i]);
+}
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementsByClassName("header")[0]) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementsByClassName("header")[0].onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,5 +1,6 @@
 from django.shortcuts import render
-
+from .forms import StickyNoteForm, StickyNoteModelForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 from .models import StickyNote
@@ -13,4 +14,21 @@ def sticky_note_overview_page(request):
     objs = StickyNote.objects.all()
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
+    return render(request, template_name, context)
+
+def sticky_note_test_page(request):
+    objs = StickyNote.objects.all()
+    template_name = "sticky_note.html"
+    context = {"objects" : objs}
+    return render(request, template_name, context)
+
+@login_required
+def sticky_note_create_page(request):
+    print(request.user)
+    form = StickyNoteModelForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        form = StickyNoteModelForm()
+    template_name = "sticky_note_create.html"
+    context = {"form":  form}
     return render(request, template_name, context)
