@@ -26,7 +26,7 @@ SECRET_KEY = 'jd66nrgtu!kify(k0a!o^wf9wiffluskb3ha9&tgfv1mi^5xjo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.0.30"]
 
 LOGIN_URL = '/login'
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'note',
+    'user_profile'
 ]
 
 MIDDLEWARE = [
