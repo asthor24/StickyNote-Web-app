@@ -192,7 +192,7 @@ function dragElement(elmnt) {
     document.onmouseup = closeDragElement;
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
-    
+
     var note_id = elmnt.getAttribute("note_id");
 
     if(elmnt.style.zIndex < cnt) {
@@ -224,6 +224,7 @@ function dragElement(elmnt) {
     var y = elmnt.offsetTop *100/h
     elmnt.setAttribute("x", x)
     elmnt.setAttribute("y", y)
+    var note_id = elmnt.id; 
 	  if ((x > 75 && y > 75) && confirm("Delete note?")){
 	  $.ajax({
       url: '/note/ajax/delete/',
