@@ -8,6 +8,7 @@ class StickyNote(models.Model):
     title = models.CharField(max_length =120)
     x = models.IntegerField(blank = True, null = True)
     y = models.IntegerField(blank = True, null = True)
+    zindex = models.IntegerField(blank = True, null = True,unique=True)
     slug = models.SlugField(blank = True, null = True)
     content = models.TextField(null= True, blank = True)
 

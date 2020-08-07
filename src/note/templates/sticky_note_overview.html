@@ -60,7 +60,7 @@
 
 {% for object in objects %}
 
-<div id="{{object.id}}" class="mydiv" X = {{object.x}} Y = {{object.y}} --note-id = {{object.id}} onclick="onClick(id)" >
+<div id="{{object.id}}" class="mydiv" X = {{object.x}} Y = {{object.y}} Z = {{object.zindex}} --note-id = {{object.id}} onclick="onClick(id)" >
   <div class="mydivheader">
     <input id="{{object.id}} header" value="{{object.title}}" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="headertextbox" --note-id = "{{object.id}}" /> 
   </div>
@@ -73,28 +73,35 @@
 
 
 <script>
-  var cnt = 40;
 //Make the DIV element draggagle:
 window.addEventListener("resize", calibrateNotePosition);
-
+var cnt = 0;
 var mydivs = document.getElementsByClassName("mydiv")
 function calibrateNotePosition(){
   for (var i = 0; i < mydivs.length; i++){
     mydivs[i].style.left = mydivs[i].getAttribute("X")*window.innerWidth/100 + "px"
     mydivs[i].style.top  = mydivs[i].getAttribute("Y")*window.innerHeight/100 + "px"
+    
     var note_id = mydivs[i].getAttribute("--note-id")
-    console.log(mydivs[i].style.height)
     document.getElementById(note_id + " content").style.height = parseInt(mydivs[i].clientHeight)-24 + "px";
   }
 }
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
+  var zIndex = mydivs[i].getAttribute("Z")
+  cnt = Math.max(cnt, zIndex)
+  updateZindex(mydivs[i].id, zIndex, false)
   calibrateNotePosition()
+}
+
+//console.log(cnt)
+for(var i =  0; i < mydivs.length; i++)
+{
+  updateZindex(mydivs[i].id)
 }
 var isFocused = false;
 function setFocus(e)
 {
-  console.log("got focus")
   for(var i = 0; i < mydivs.length; i++)
   {
     mydivs[i].onmousedown = null;
@@ -107,10 +114,27 @@ function setFocus(e)
 }
 
 function onClick(e)
+{ 
+
+}
+
+function updateZindex(id, zIndexTmp, updateDb)
 {
-  console.log("click")
-  var element = document.getElementById(e)
-  element.style.zIndex = cnt++;
+  var element = document.getElementById(id)
+  element.style.zIndex = zIndexTmp;
+  //console.log("Z-Index: " + element.style.zIndex, "ID: "+id);
+  var dict = {
+    'zindex' : zIndexTmp,
+    'id' : id
+  }
+  if(updateDb)
+  {
+    $.ajax({
+        url: '/note/ajax/update/zindex',
+        data: dict,
+        type: 'POST'
+      })
+  }
 }
 
 function lostFocus(e)
@@ -121,9 +145,7 @@ function lostFocus(e)
     dragElement(mydivs[i]);
   }
   var element = document.getElementById(e);
-  console.log(element)
   var mydiv = document.getElementById(element.getAttribute("--note-id"))
-  console.log(mydiv);
   var myheader = document.getElementById(mydiv.id + " header");
   var mycontent = document.getElementById(mydiv.id + " content");
 
@@ -174,13 +196,21 @@ function dragElement(elmnt) {
     elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
   }
 
-  function closeDragElement() {
+  function closeDragElement(e) {
     /* stop moving when mouse button is released:*/
     document.onmouseup = null;
     document.onmousemove = null;
     var w = window.innerWidth;
     var h = window.innerHeight;
     var posdict = {"xScreen":w, "yScreen":h}
+    var this_note_id = elmnt.getAttribute("--note-id");
+    var element = elmnt;
+
+    if(element.style.zIndex < cnt)
+    {
+      cnt += 1
+      updateZindex(this_note_id,cnt,true);
+    }
     for (var i = 0; i < mydivs.length; i++){
       var mydivStyle = mydivs[i].style
       var note_id = mydivs[i].getAttribute('--note-id')

@@ -23,6 +23,7 @@ def sticky_note_overview_page(request):
     print(request.user)
     template_name = "sticky_note_overview.html"
     context = {"objects" : objs}
+    print(context)
     return render(request, template_name, context)
 
 def sticky_note_test_page(request):
@@ -94,4 +95,20 @@ def ajax_note_update_content_page(request):
         note.title = header
         note.content = content
         note.save()
+    return HttpResponse('Hue')
+
+@csrf_exempt
+def ajax_note_update_zindex_page(request):
+    if request.method == "POST" and request.is_ajax():
+        contentdict = dict(request.POST)
+        this_note = StickyNote.objects.get(id=contentdict["id"][0]);
+        this_zindex = int(contentdict["zindex"][0])
+        print("NEW Z-INDEX:",this_zindex)
+        print("OLD Z-INDEX:",this_note.zindex)
+        print("This note:", repr(this_note))
+        #print(dir(this_note))
+        this_note.zindex = this_zindex
+        this_note.save()
+        this_note.zindex = this_zindex
+        this_note.save()
     return HttpResponse('Hue')

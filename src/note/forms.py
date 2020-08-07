@@ -5,6 +5,7 @@ class StickyNoteForm(forms.Form):
     content =  forms.CharField()
     x = 0
     y = 0
+    zindex = 0
     slug = ""
 
 class StickyNoteModelForm(forms.ModelForm):
