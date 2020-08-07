@@ -192,6 +192,13 @@ function dragElement(elmnt) {
     document.onmouseup = closeDragElement;
     // call a function whenever the cursor moves:
     document.onmousemove = elementDrag;
+    
+    var note_id = elmnt.getAttribute("note_id");
+
+    if(elmnt.style.zIndex < cnt) {
+      cnt += 1
+      updateZindex(note_id,cnt,true);
+    }
   }
 
   function elementDrag(e) {
@@ -213,12 +220,6 @@ function dragElement(elmnt) {
     document.onmousemove = null;
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var note_id = elmnt.getAttribute("note_id");
-
-    if(elmnt.style.zIndex < cnt) {
-      cnt += 1
-      updateZindex(note_id,cnt,true);
-    }
     var x = elmnt.offsetLeft*100/w
     var y = elmnt.offsetTop *100/h
     elmnt.setAttribute("x", x)
@@ -229,14 +230,14 @@ function dragElement(elmnt) {
       data: {"note_id":note_id},
       type: 'POST'
     })
-	    e.remove()
+	    elmnt.remove()
 	  }
 	  else { //Update position
 		  $.ajax({
 	    	  url: '/note/ajax/update/',
      		 data: {"x":x, 
 	    		"y":y,
-			"note_id":e.getAttribute("note_id")
+			"note_id":elmnt.getAttribute("note_id")
       	},
     	  type: 'POST'
     	})

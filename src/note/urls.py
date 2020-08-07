@@ -1,12 +1,20 @@
 
 from django.urls import path, include
-from .views import sticky_note_detail_page, sticky_note_overview_page, sticky_note_test_page,sticky_note_create_page, sticky_note_update_page, \
-<<<<<<< HEAD
-sticky_note_delete_page, ajax_note_update_page, ajax_note_update_content_page, ajax_note_update_zindex_page
-=======
-sticky_note_delete_page, ajax_note_update_page, ajax_note_update_content_page, ajax_note_delete_page
->>>>>>> 43a45c7e9b37adb6023c52fc46c5ce61b03adc8f
-
+from .views import (
+	sticky_note_detail_page, 
+	sticky_note_overview_page, 
+	sticky_note_test_page,
+	sticky_note_create_page, 
+	sticky_note_update_page, 
+	sticky_note_delete_page, 
+	ajax_note_update_page, 
+	ajax_note_update_content_page, 
+	ajax_note_update_zindex_page,
+	sticky_note_delete_page, 
+	ajax_note_update_page, 
+	ajax_note_update_content_page, 
+	ajax_note_delete_page
+)
 
 urlpatterns = [
     path('<int:note_id>/', sticky_note_detail_page),
@@ -17,5 +25,6 @@ urlpatterns = [
     path('delete/<int:note_id>/', sticky_note_delete_page),
     path('ajax/update/', ajax_note_update_page),
     path('ajax/update/content', ajax_note_update_content_page),
-    path('ajax/update/zindex', ajax_note_update_zindex_page)
+    path('ajax/update/zindex', ajax_note_update_zindex_page),
     path('ajax/delete/', ajax_note_delete_page),
+]
