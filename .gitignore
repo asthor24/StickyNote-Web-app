@@ -5,4 +5,4 @@
 *.bak
 
 # Database
-src/*.sqlite3
+*.sqlite3
