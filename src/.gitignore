@@ -1,2 +1,8 @@
+# Python compiled files
 *.pyc
-src/db.sqlite3
+
+# Text backup files
+*.bak
+
+# Database
+*.sqlite3
