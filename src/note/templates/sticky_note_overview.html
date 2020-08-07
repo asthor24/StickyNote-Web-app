@@ -12,8 +12,8 @@
   background-color: #fcfc00;
   text-align: center;
   border: 1px solid #aaaa00;
-  height: min(30vw, 30vh);
-  width: min(30vw, 30vh);
+  height: min(20vw, 20vh);
+  width: min(20vw, 20vh);
 }
 
 .mydivheader {
@@ -45,8 +45,26 @@
   text-align: center;
   height: 100vh;
 }
+
+.bottomright {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+img { 
+  height: min(10vw, 10vh);
+  width: min(10vw, 10vh);
+}
+
+
 </style>
 <body id = "frame">
+
+{% load static %}
+<img src="{% static "note/trash.png" %}" alt="My image" class="bottomright">
+
 
   <div class="column" style="background-color:#ccc;">
     <h1> To-Do </h1>
@@ -60,11 +78,11 @@
 
 {% for object in objects %}
 
-<div id="{{object.id}}" class="mydiv" X = {{object.x}} Y = {{object.y}} Z = {{object.zindex}} --note-id = {{object.id}} onclick="onClick(id)" >
+<div id="{{object.id}}" class="mydiv" x = {{object.x}} y = {{object.y}} Z = {{object.zindex}} note_id = {{object.id}}>
   <div class="mydivheader">
-    <input id="{{object.id}} header" value="{{object.title}}" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="headertextbox" --note-id = "{{object.id}}" /> 
+    <input id="{{object.id}} header" value="{{object.title}}" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="headertextbox" note_id = "{{object.id}}" /> 
   </div>
-  <textarea id="{{object.id}} content" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="content" --note-id = {{object.id}}>
+  <textarea id="{{object.id}} content" ondblclick="setFocus(id)" onfocusout="lostFocus(id)" class="content" note_id = {{object.id}}>
     {{object.content}}
   </textarea>  
 </div>
@@ -73,18 +91,19 @@
 
 
 <script>
-//Make the DIV element draggagle:
-window.addEventListener("resize", calibrateNotePosition);
+window.addEventListener("resize", calibrateNotePosition); // On browser resize, move notes
+
 var cnt = 0;
 var mydivs = document.getElementsByClassName("mydiv")
+
 function calibrateNotePosition(){
-  for (var i = 0; i < mydivs.length; i++){
-    mydivs[i].style.left = mydivs[i].getAttribute("X")*window.innerWidth/100 + "px"
-    mydivs[i].style.top  = mydivs[i].getAttribute("Y")*window.innerHeight/100 + "px"
-    
-    var note_id = mydivs[i].getAttribute("--note-id")
-    document.getElementById(note_id + " content").style.height = parseInt(mydivs[i].clientHeight)-24 + "px";
-  }
+for (var i = 0; i < mydivs.length; i++){
+  mydivs[i].style.left = mydivs[i].getAttribute("x")*window.innerWidth/100 + "px"
+  mydivs[i].style.top  = mydivs[i].getAttribute("y")*window.innerHeight/100 + "px"
+  var note_id = mydivs[i].getAttribute("note_id")
+  document.getElementById(note_id + " content").style.height = parseInt(mydivs[i].clientHeight)-24 + "px";
+}
+
 }
 for (var i = 0; i < mydivs.length; i++){
   dragElement(mydivs[i]);
@@ -94,11 +113,6 @@ for (var i = 0; i < mydivs.length; i++){
   calibrateNotePosition()
 }
 
-//console.log(cnt)
-for(var i =  0; i < mydivs.length; i++)
-{
-  updateZindex(mydivs[i].id)
-}
 var isFocused = false;
 function setFocus(e)
 {
@@ -111,11 +125,6 @@ function setFocus(e)
   var element = document.getElementById(e)
   element.focus()
   element.selectionStart = element.selectionEnd = element.value.length;
-}
-
-function onClick(e)
-{ 
-
 }
 
 function updateZindex(id, zIndexTmp, updateDb)
@@ -145,7 +154,9 @@ function lostFocus(e)
     dragElement(mydivs[i]);
   }
   var element = document.getElementById(e);
-  var mydiv = document.getElementById(element.getAttribute("--note-id"))
+  console.log(element)
+  var mydiv = document.getElementById(element.getAttribute("note_id"))
+  console.log(mydiv);
   var myheader = document.getElementById(mydiv.id + " header");
   var mycontent = document.getElementById(mydiv.id + " content");
 
@@ -202,38 +213,34 @@ function dragElement(elmnt) {
     document.onmousemove = null;
     var w = window.innerWidth;
     var h = window.innerHeight;
-    var posdict = {"xScreen":w, "yScreen":h}
-    var this_note_id = elmnt.getAttribute("--note-id");
-    var element = elmnt;
+    var note_id = elmnt.getAttribute("note_id");
 
-    if(element.style.zIndex < cnt)
-    {
+    if(elmnt.style.zIndex < cnt) {
       cnt += 1
-      updateZindex(this_note_id,cnt,true);
+      updateZindex(note_id,cnt,true);
     }
-    for (var i = 0; i < mydivs.length; i++){
-      var mydivStyle = mydivs[i].style
-      var note_id = mydivs[i].getAttribute('--note-id')
-      posdict[note_id] = [mydivStyle.left, mydivStyle.top]
-      //console.log("CORDS:", [mydivStyle.left, mydivStyle.top])
-
-      mydivs[i].setAttribute("X", mydivs[i].offsetLeft*100/w)
-      mydivs[i].setAttribute("Y", mydivs[i].offsetTop*100/h)
-
-    }
-    //console.log("Width and Height:", w, h)
-    $.ajax({
-      url: '/note/ajax/update/',
-      data: posdict,
+    var x = elmnt.offsetLeft*100/w
+    var y = elmnt.offsetTop *100/h
+    elmnt.setAttribute("x", x)
+    elmnt.setAttribute("y", y)
+	  if ((x > 75 && y > 75) && confirm("Delete note?")){
+	  $.ajax({
+      url: '/note/ajax/delete/',
+      data: {"note_id":note_id},
       type: 'POST'
     })
-    //console.log('Logging complete!')
-    //   dict[mydivStyle.getPropertyValue("--note-id")] = (mydivStyle.top, mydivStyle.left);
-    // }
-    // console.log("made it boi");
-    // var dictString = JSON.stringify(dict);
-    // var fs = require('fs');
-    // fs.writeFile("mydivs.json", dictstring);
+	    e.remove()
+	  }
+	  else { //Update position
+		  $.ajax({
+	    	  url: '/note/ajax/update/',
+     		 data: {"x":x, 
+	    		"y":y,
+			"note_id":e.getAttribute("note_id")
+      	},
+    	  type: 'POST'
+    	})
+	  }
   }
 
 }
