@@ -20,7 +20,12 @@ def login_page(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user:
+            #print("is güd")
             login(request, user)
+            print("isabletologin")
             return redirect("../note/")
+        else:
+            print("isnotabletologin")
+            #print("is nat güd")
 
     return render(request, "login.html", context)

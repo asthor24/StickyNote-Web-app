@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .forms import ContactForm
 
+# @login_required
 def home_page(request):
     mytitle = "what nana"
     return render(request, "home_page.html", {"title": repr(request)})
