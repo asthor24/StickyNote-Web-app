@@ -1,1 +1,1 @@
-web: gunicorn StickyNote-Web-app.wsgi --log-file -
+web: gunicorn note.wsgi --log-file -
