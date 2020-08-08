@@ -1,1 +1,1 @@
-web: gunicorn try_django.wsgi --log-file -
+web: gunicorn StickyNote-Web-app.wsgi --log-file -
